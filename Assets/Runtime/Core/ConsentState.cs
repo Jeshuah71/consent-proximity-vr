@@ -1,6 +1,11 @@
-using UnityEngine;
-
-public class ConsentState
+namespace ConsentProximity.Core
 {
-    
+    public enum ConsentState
+    {
+        Idle,
+        InRange,
+        Requested,
+        Active,
+        Terminated
+    }
 }
