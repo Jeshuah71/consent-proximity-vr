@@ -11,3 +11,4 @@ UserSettings/
 *.csproj
 *.sln
 .DS_Store
+/.vs/consent-proximity-vr
