@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using ConsentProximity.Core;
 
 namespace ConsentProximity.StateMachine
 {
     /// <summary>
     /// State Machine:
-    /// Idle → InRange → Requested → Active → Terminated
+    /// Idle -> InRange -> Requested -> Active -> Terminated
     ///
     /// Key rules:
     /// - Handles timeouts, cancellations, distance exceed, re-enter range, duplicate requests,
@@ -13,8 +13,8 @@ namespace ConsentProximity.StateMachine
     /// - It can just ask consent by being within InRange.
     /// - Requested expires for timeout.
     /// - Requested can be cancelled by requester.
-    /// - If you exceed distance in Requested/Active → Terminated(DistanceExceeded).
-    /// - If anyone withdraws consent (Withdraw) in Requested/Active → Terminated immediately.
+    /// - If you exceed distance in Requested/Active -> Terminated (DistanceExceeded).
+    /// - If anyone withdraws consent (Withdraw) -> Terminated immediately.
     /// - Duplicate request is rejected (no state change).
     /// </summary>
     public sealed class ConsentStateMachine
@@ -73,7 +73,6 @@ namespace ConsentProximity.StateMachine
 
             // If we were already Terminated, the integration layer decides whether to reset with a new instance,
             // or maintain Terminated until explicit reset (for simplicity we keep Terminated).
-
         }
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace ConsentProximity.StateMachine
             if (State != ConsentState.InRange || !_inRange) return false;
             if (!IsParticipant(requester)) return false;
 
-            // Duplciate request: if there's already a request or active, reject.
+            // Duplicate request: if there's already a request or active, reject.
             if (State == ConsentState.Requested || State == ConsentState.Active) return false;
 
             _hasRequest = true;
@@ -127,13 +126,13 @@ namespace ConsentProximity.StateMachine
         }
 
         /// <summary>
-        /// Anyone withdraws consent. Must terminate immediately if Requested or Active.
+        /// Anyone withdraws consent. Must terminate immediately regardless of current state.
         /// </summary>
         public bool Withdraw(ParticipantId who)
         {
             if (!IsParticipant(who)) return false;
 
-            if (State == ConsentState.Requested || State == ConsentState.Active)
+            if (State != ConsentState.Terminated)
             {
                 Terminate(TerminationReason.WithdrawnConsent);
                 return true;

@@ -1,6 +1,11 @@
-using UnityEngine;
+﻿using ConsentProximity.Core;
 
-public class NewEmptyCSharpScript
+public sealed class FakeDistanceProvider : IDistanceProvider
 {
-    
+    public float DistanceMeters { get; set; }
+
+    public float GetDistanceMeters(ParticipantId a, ParticipantId b)
+    {
+        return DistanceMeters;
+    }
 }
