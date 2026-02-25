@@ -46,8 +46,20 @@ namespace ConsentProximityFramework.Runtime.Networking
 
         public void ExitProximity()
         {
-            if (currentState != ConsentState.Idle)
+            // If interaction is active or pending, force termination
+            if (currentState == ConsentState.Requested ||
+                currentState == ConsentState.Active)
+            {
+                SetState(ConsentState.Terminated);
                 SetState(ConsentState.Idle);
+                return;
+            }
+
+            // If just in range, go back to Idle
+            if (currentState == ConsentState.InRange)
+            {
+                SetState(ConsentState.Idle);
+            }
         }
 
         // -----------------------------
@@ -101,6 +113,9 @@ namespace ConsentProximityFramework.Runtime.Networking
             }
 
             SetState(ConsentState.Terminated);
+
+            // Reset safely
+            SetState(ConsentState.Idle);
         }
 
         public void TerminateInteraction()
@@ -113,6 +128,9 @@ namespace ConsentProximityFramework.Runtime.Networking
             }
 
             SetState(ConsentState.Terminated);
+
+            // Reset safely
+            SetState(ConsentState.Idle);
         }
 
         // -----------------------------
