@@ -59,6 +59,19 @@ public class NgoNetworkAdapterTests
     }
 
     [Test]
+    public void ReceiveOlderMessage_FromSameSenderSession_IsIgnored()
+    {
+        _flow.EnterProximity();
+
+        InvokeReceive(CreateMessage(ConsentNetMessageType.Request, "s1", 2, 11));
+        Assert.AreEqual(ConsentState.Requested, _flow.CurrentState);
+
+        // Older message id should be treated as stale and ignored.
+        InvokeReceive(CreateMessage(ConsentNetMessageType.Request, "s1", 1, 11));
+        Assert.AreEqual(ConsentState.Requested, _flow.CurrentState);
+    }
+
+    [Test]
     public void ReceiveAccept_TransitionsRequestedToActive()
     {
         _flow.EnterProximity();

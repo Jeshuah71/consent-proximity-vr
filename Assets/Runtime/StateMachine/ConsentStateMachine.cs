@@ -17,7 +17,7 @@ namespace ConsentProximity.StateMachine
     /// - If anyone withdraws consent (Withdraw) -> Terminated immediately.
     /// - Duplicate request is rejected (no state change).
     /// </summary>
-    public sealed class ConsentStateMachine
+    public sealed class ConsentStateMachine : IConsentService
     {
         public event Action<ConsentState, ConsentState> OnStateChanged;
         public event Action<TerminationReason> OnTerminated;
