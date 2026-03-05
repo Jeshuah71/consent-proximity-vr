@@ -77,6 +77,12 @@ namespace ConsentProximityFramework.Runtime.Networking
             SetState(ConsentState.Requested);
         }
 
+        // Network-facing alias for adapter integration.
+        public void OnConsentRequested()
+        {
+            RequestConsent();
+        }
+
         public void AcceptConsent()
         {
             if (currentState != ConsentState.Requested)
@@ -88,6 +94,12 @@ namespace ConsentProximityFramework.Runtime.Networking
             SetState(ConsentState.Active);
         }
 
+        // Network-facing alias for adapter integration.
+        public void OnConsentAccepted()
+        {
+            AcceptConsent();
+        }
+
         public void RejectConsent()
         {
             if (currentState != ConsentState.Requested)
@@ -97,6 +109,12 @@ namespace ConsentProximityFramework.Runtime.Networking
             }
 
             SetState(ConsentState.InRange);
+        }
+
+        // Network-facing alias for adapter integration.
+        public void OnConsentRejected()
+        {
+            RejectConsent();
         }
 
         // -----------------------------
@@ -118,6 +136,12 @@ namespace ConsentProximityFramework.Runtime.Networking
             SetState(ConsentState.Idle);
         }
 
+        // Network-facing alias for adapter integration.
+        public void OnConsentWithdrawn()
+        {
+            WithdrawConsent();
+        }
+
         public void TerminateInteraction()
         {
             if (currentState != ConsentState.Requested &&
@@ -133,6 +157,17 @@ namespace ConsentProximityFramework.Runtime.Networking
             SetState(ConsentState.Idle);
         }
 
+        // Network-facing alias for adapter integration.
+        public void OnConsentTerminated(string reason = null)
+        {
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                Debug.Log($"Remote terminate reason: {reason}");
+            }
+
+            TerminateInteraction();
+        }
+
         // -----------------------------
         // DISCONNECT SAFETY
         // -----------------------------
@@ -146,6 +181,12 @@ namespace ConsentProximityFramework.Runtime.Networking
             }
 
             SetState(ConsentState.Idle);
+        }
+
+        // Network-facing overload for adapters passing remote client IDs.
+        public void OnRemoteDisconnect(ulong _)
+        {
+            OnRemoteDisconnect();
         }
     }
 }

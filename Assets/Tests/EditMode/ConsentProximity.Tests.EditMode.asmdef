@@ -2,7 +2,8 @@
   "name": "ConsentProximity.Tests.EditMode",
   "rootNamespace": "ConsentProximity.Tests",
   "references": [
-    "ConsentProximity.Runtime"
+    "ConsentProximity.Runtime",
+    "ConsentProximity.Networking"
   ],
   "includePlatforms": [
     "Editor"
