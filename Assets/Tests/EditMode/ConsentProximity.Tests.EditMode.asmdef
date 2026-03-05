@@ -1,6 +1,9 @@
-﻿{
+{
   "name": "ConsentProximity.Tests.EditMode",
   "rootNamespace": "ConsentProximity.Tests",
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ],
   "references": [
     "ConsentProximity.Runtime",
     "ConsentProximity.Networking"
