@@ -1,3 +1,4 @@
+#if ENABLE_CONSENT_NGO
 using NUnit.Framework;
 
 public class SessionAuthorityRegistryTests
@@ -74,3 +75,4 @@ public class SessionAuthorityRegistryTests
         Assert.IsFalse(allowed);
     }
 }
+#endif

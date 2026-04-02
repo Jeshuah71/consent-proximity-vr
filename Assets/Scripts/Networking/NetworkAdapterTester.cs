@@ -1,3 +1,4 @@
+#if NGO_AVAILABLE
 using Unity.Netcode;
 using UnityEngine;
 
@@ -84,3 +85,4 @@ public class NetworkAdapterTester : MonoBehaviour
         GUI.Label(new Rect(20, 185, 520, 25), $"SessionId: {sessionId}");
     }
 }
+#endif

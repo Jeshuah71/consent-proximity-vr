@@ -1,3 +1,4 @@
+#if NGO_AVAILABLE
 using Unity.Collections;
 using Unity.Netcode;
 
@@ -29,3 +30,4 @@ public struct ConsentNetMessage : INetworkSerializable
         serializer.SerializeValue(ref SentAt);
     }
 }
+#endif

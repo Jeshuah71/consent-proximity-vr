@@ -1,3 +1,4 @@
+#if NGO_AVAILABLE
 using Unity.Netcode;
 using UnityEngine;
 
@@ -70,3 +71,4 @@ public class NetworkBootstrap : MonoBehaviour
         Debug.Log($"[NGO] Client disconnected: {clientId}");
     }
 }
+#endif

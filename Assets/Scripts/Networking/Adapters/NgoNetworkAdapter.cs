@@ -1,3 +1,4 @@
+#if NGO_AVAILABLE
 using System.Collections.Generic;
 using ConsentProximityFramework.Runtime.Networking;
 using Unity.Netcode;
@@ -188,3 +189,4 @@ public class NgoNetworkAdapter : NetworkBehaviour, INetworkAdapter
         flowManager.OnRemoteDisconnect(clientId);
     }
 }
+#endif

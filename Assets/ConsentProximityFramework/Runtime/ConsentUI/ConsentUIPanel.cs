@@ -2,12 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace ConsentProximityFramework.Runtime.UI
+namespace ConsentProximityFramework.Runtime.ConsentUI
 {
     /// <summary>
-    /// Backward-compatible UI component kept for existing scene references in the runtime assembly.
+    /// Local consent prompt with explicit accept/reject actions and an always-available withdraw control while active.
     /// </summary>
-    public class ConsentUI : MonoBehaviour
+    public class ConsentUIPanel : MonoBehaviour
     {
         [Header("UI References")]
         [SerializeField] private GameObject requestPanel;
@@ -18,10 +18,10 @@ namespace ConsentProximityFramework.Runtime.UI
         [SerializeField] private bool showOnStart;
 
         [Header("Events")]
-        public UnityEvent OnAccept;
-        public UnityEvent OnReject;
-        public UnityEvent OnWithdraw;
-        public UnityEvent OnTimedOut;
+        [SerializeField] private UnityEvent onAccept;
+        [SerializeField] private UnityEvent onReject;
+        [SerializeField] private UnityEvent onWithdraw;
+        [SerializeField] private UnityEvent onTimedOut;
 
         private Coroutine _timeoutRoutine;
 
@@ -34,11 +34,11 @@ namespace ConsentProximityFramework.Runtime.UI
         {
             if (showOnStart)
             {
-                Show();
+                ShowRequest();
             }
         }
 
-        public void Show()
+        public void ShowRequest()
         {
             SetRequestVisible(true);
             SetWithdrawVisible(false);
@@ -52,36 +52,31 @@ namespace ConsentProximityFramework.Runtime.UI
             SetWithdrawVisible(true);
         }
 
-        public void Hide()
+        public void HideAll()
         {
-            HideAll();
+            StopTimeout();
+            SetRequestVisible(false);
+            SetWithdrawVisible(false);
         }
 
         public void Accept()
         {
             StopTimeout();
-            OnAccept?.Invoke();
+            onAccept?.Invoke();
         }
 
         public void Reject()
         {
             StopTimeout();
-            OnReject?.Invoke();
+            onReject?.Invoke();
             HideAll();
         }
 
         public void Withdraw()
         {
             StopTimeout();
-            OnWithdraw?.Invoke();
+            onWithdraw?.Invoke();
             HideAll();
-        }
-
-        private void HideAll()
-        {
-            StopTimeout();
-            SetRequestVisible(false);
-            SetWithdrawVisible(false);
         }
 
         private void RestartTimeout()
@@ -110,7 +105,7 @@ namespace ConsentProximityFramework.Runtime.UI
                 yield return null;
             }
 
-            OnTimedOut?.Invoke();
+            onTimedOut?.Invoke();
             Reject();
         }
 

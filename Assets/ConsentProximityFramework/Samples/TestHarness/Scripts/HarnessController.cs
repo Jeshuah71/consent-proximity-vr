@@ -1,6 +1,7 @@
-﻿using UnityEngine;
 using ConsentProximity.Core;
 using ConsentProximity.StateMachine;
+using ConsentProximityFramework.Runtime.Proximity;
+using UnityEngine;
 
 namespace ConsentProximity.TestHarness
 {
@@ -14,6 +15,9 @@ namespace ConsentProximity.TestHarness
         public float maxRangeMeters = 2f;
         public float requestTimeoutSeconds = 8f;
 
+        [Header("Services")]
+        [SerializeField] private ProximityService proximityService;
+
         public ConsentStateMachine Machine { get; private set; }
         public float CurrentDistance { get; private set; }
 
@@ -23,13 +27,19 @@ namespace ConsentProximity.TestHarness
         private readonly ParticipantId _idA = new ParticipantId("A");
         private readonly ParticipantId _idB = new ParticipantId("B");
 
-        void Awake()
+        private void Awake()
         {
             _clock = gameObject.AddComponent<UnityClockAdapter>();
+
+            if (proximityService == null)
+            {
+                proximityService = gameObject.AddComponent<ProximityService>();
+            }
 
             _distanceProvider = new TransformDistanceProvider();
             _distanceProvider.Register(_idA, playerA);
             _distanceProvider.Register(_idB, playerB);
+            proximityService.Configure(_idA, playerA, _idB, playerB);
 
             var config = new ConsentConfig
             {
@@ -40,24 +50,29 @@ namespace ConsentProximity.TestHarness
             Machine = new ConsentStateMachine(_idA, _idB, config, _clock, _distanceProvider);
 
             Machine.OnStateChanged += (prev, next) =>
-                Debug.Log($"[Harness] State: {prev} → {next}");
+                Debug.Log($"[Harness] State: {prev} -> {next}");
             Machine.OnTerminated += reason =>
                 Debug.Log($"[Harness] Terminated: {reason}");
+
+            proximityService.OnRangeChanged += (_, _, isInRange) => Machine.SetInRange(isInRange);
+            proximityService.OnDistanceUpdated += (_, _, distanceMeters) => CurrentDistance = distanceMeters;
         }
 
-        void Update()
+        private void Update()
         {
-            if (playerA == null || playerB == null) return;
+            if (playerA == null || playerB == null)
+            {
+                return;
+            }
 
-            CurrentDistance = Vector3.Distance(playerA.position, playerB.position);
-            Machine.SetInRange(CurrentDistance <= maxRangeMeters);
+            proximityService.EvaluateNow();
             Machine.Tick();
 
-            if (Input.GetKeyDown(KeyCode.R)) Machine.RequestConsent(_idB); // B requests
-            if (Input.GetKeyDown(KeyCode.A)) Machine.Accept(_idA);         // A accepts
-            if (Input.GetKeyDown(KeyCode.W)) Machine.Withdraw(_idB);       // B withdraws
-            if (Input.GetKeyDown(KeyCode.C)) Machine.Cancel(_idB);         // B cancels
-            if (Input.GetKeyDown(KeyCode.X)) Machine.Withdraw(_idA);       // A rejects/blocks B
+            if (Input.GetKeyDown(KeyCode.R)) Machine.RequestConsent(_idB);
+            if (Input.GetKeyDown(KeyCode.A)) Machine.Accept(_idA);
+            if (Input.GetKeyDown(KeyCode.W)) Machine.Withdraw(_idB);
+            if (Input.GetKeyDown(KeyCode.C)) Machine.Cancel(_idB);
+            if (Input.GetKeyDown(KeyCode.X)) Machine.Withdraw(_idA);
         }
     }
 }

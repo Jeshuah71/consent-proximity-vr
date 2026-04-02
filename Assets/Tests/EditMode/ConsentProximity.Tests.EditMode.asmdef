@@ -6,7 +6,7 @@
   ],
   "references": [
     "ConsentProximity.Runtime",
-    "ConsentProximity.Networking"
+    "ConsentProximity.Framework"
   ],
   "includePlatforms": [
     "Editor"

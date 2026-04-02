@@ -1,4 +1,6 @@
+#if NGO_AVAILABLE
 using System.Reflection;
+using ConsentProximity.Core;
 using ConsentProximityFramework.Runtime.Networking;
 using NUnit.Framework;
 using Unity.Netcode;
@@ -121,3 +123,4 @@ public class NgoNetworkAdapterTests
             ?.Invoke(_adapter, new object[] { msg, default(ClientRpcParams) });
     }
 }
+#endif
