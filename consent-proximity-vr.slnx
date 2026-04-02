@@ -1,3 +1,7 @@
 ﻿<Solution>
+  <Project Path="ConsentProximity.Runtime.csproj" />
+  <Project Path="ConsentProximity.Framework.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="ConsentProximity.Tests.EditMode.csproj" />
+  <Project Path="ConsentProximity.Tests.PlayMode.csproj" />
 </Solution>
