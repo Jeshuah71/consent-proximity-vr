@@ -57,7 +57,7 @@ namespace ConsentProximityFramework.Runtime.Feedback
             }
         }
 
-        void HandleStateChanged(ConsentState newState)
+        public void HandleStateChanged(ConsentState newState)
         {
             Debug.Log("Feedback received new state: " + newState);
 
