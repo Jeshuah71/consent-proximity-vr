@@ -2,8 +2,7 @@
   "name": "ConsentProximity.Framework",
   "rootNamespace": "ConsentProximityFramework",
   "references": [
-    "ConsentProximity.Runtime",
-    "Unity.XR.Interaction.Toolkit"
+    "ConsentProximity.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

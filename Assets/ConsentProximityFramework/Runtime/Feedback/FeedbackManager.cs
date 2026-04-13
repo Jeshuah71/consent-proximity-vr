@@ -1,10 +1,9 @@
 using UnityEngine;
+using UnityEngine.XR;
 using System.Collections;
+using System.Collections.Generic;
 using ConsentProximity.Core;
 using ConsentProximityFramework.Runtime.Networking;
-#if UNITY_XR_INTERACTION_TOOLKIT
-using UnityEngine.XR.Interaction.Toolkit;
-#endif
 
 namespace ConsentProximityFramework.Runtime.Feedback
 {
@@ -25,9 +24,8 @@ namespace ConsentProximityFramework.Runtime.Feedback
         public GameObject activeVFX;
 
         [Header("Haptics")]
-#if UNITY_XR_INTERACTION_TOOLKIT
-        public XRBaseController controller;
-#endif
+        [Tooltip("Which hand to vibrate: Left or Right controller.")]
+        public InputDeviceCharacteristics hapticHand = InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller;
 
         [Header("Audio")]
         public AudioSource audioSource;
@@ -113,14 +111,19 @@ namespace ConsentProximityFramework.Runtime.Feedback
 
         void Vibrate(float intensity, float duration)
         {
-#if UNITY_XR_INTERACTION_TOOLKIT
-            if (controller != null)
+            var devices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(hapticHand, devices);
+
+            foreach (var device in devices)
             {
-                controller.SendHapticImpulse(intensity, duration);
+                if (device.TryGetHapticCapabilities(out var caps) && caps.supportsImpulse)
+                {
+                    device.SendHapticImpulse(0, intensity, duration);
+                    return;
+                }
             }
-#else
-            Debug.Log($"[Haptic] intensity={intensity} duration={duration} (XR Interaction Toolkit not installed)");
-#endif
+
+            Debug.Log($"[Haptic] intensity={intensity} duration={duration} (no XR controller found)");
         }
 
         void PlaySound(AudioClip clip)
