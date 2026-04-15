@@ -330,7 +330,7 @@ MonoBehaviour:
   requestPanel: {fileID: 253950384402275601}
   withdrawPanel: {fileID: 3680446544277481914}
   timeoutSeconds: 15
-  showOnStart: 1
+  showOnStart: 0
   OnAccept:
     m_PersistentCalls:
       m_Calls:
