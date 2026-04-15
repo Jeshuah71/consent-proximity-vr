@@ -150,9 +150,11 @@ namespace ConsentProximity.TestHarness
         {
             _isInRange = isInRange;
 
-            // If we left range while in a Terminated state, rebuild the machine so
-            // the next entry triggers a fresh consent flow.
-            if (!isInRange && Machine.State == ConsentState.Terminated)
+            // Rebuild the machine on range ENTRY if the previous interaction ended in Terminated.
+            // This covers the common case where Player A walks away during Requested (which
+            // auto-terminates via DistanceExceeded) and then returns — without this, the machine
+            // stays stuck in Terminated forever and the popup never fires again.
+            if (isInRange && Machine.State == ConsentState.Terminated)
             {
                 BuildMachine();
             }
@@ -228,6 +230,7 @@ namespace ConsentProximity.TestHarness
             if (playerA == null || playerB == null) return;
             if (Machine == null) return;
             if (Machine.State == ConsentState.Active) return; // Consent granted — free movement
+            if (_sessionConsented && oneConsentPerSession) return; // Once accepted, consent persists for the session (reset clears this)
 
             // Flatten to horizontal plane so vertical head height doesn't bias the distance
             Vector3 headPos = playerA.position;
@@ -253,10 +256,15 @@ namespace ConsentProximity.TestHarness
         [Tooltip("Delay (seconds) AFTER Player A re-enters the consent-request zone before Player B's queued response fires.")]
         public float playerBResponseDelay = 5f;
 
+        [Tooltip("Optional TMP text floating above PlayerB showing the countdown.")]
+        public TMPro.TextMeshPro playerBThinkingLabel;
+
         // Queued Player B decision set by the wall buttons. Fires only once Player A is back in range.
         private enum QueuedResponse { None, Accept, Reject }
         private QueuedResponse _queuedResponse = QueuedResponse.None;
         private Coroutine _queuedResponseRoutine;
+        private float _queuedCountdownRemaining;
+        private string _lastDecision = "—";
 
         /// <summary>Wall-button OnClick: queue an Accept from Player B. Fires after Player A re-enters range.</summary>
         public void SimulatePlayerBAccept()
@@ -272,6 +280,19 @@ namespace ConsentProximity.TestHarness
             Debug.Log("[Harness] Player B queued REJECT — will fire when Player A re-enters range.");
         }
 
+        /// <summary>Wall-button OnClick: clear everything — cancel queued responses, reset cooldowns,
+        /// rebuild the machine. Useful for resetting the demo between runs.</summary>
+        public void SimulateReset()
+        {
+            Debug.Log("[Harness] Reset pressed — clearing state.");
+            if (_queuedResponseRoutine != null) { StopCoroutine(_queuedResponseRoutine); _queuedResponseRoutine = null; }
+            _queuedResponse = QueuedResponse.None;
+            _sessionConsented = false;
+            _cooldownEndTime = 0f;
+            BuildMachine();
+            if (consentUI != null) consentUI.Hide();
+        }
+
         private void TryFireQueuedResponse()
         {
             if (_queuedResponse == QueuedResponse.None) return;
@@ -282,16 +303,46 @@ namespace ConsentProximity.TestHarness
         private IEnumerator FireQueuedResponseAfterDelay()
         {
             Debug.Log($"[Harness] Queued Player B response ({_queuedResponse}) firing in {playerBResponseDelay}s");
-            yield return new WaitForSeconds(playerBResponseDelay);
+            _queuedCountdownRemaining = playerBResponseDelay;
+            while (_queuedCountdownRemaining > 0f)
+            {
+                if (playerBThinkingLabel != null)
+                    playerBThinkingLabel.text = $"Player B is thinking…\n{Mathf.CeilToInt(_queuedCountdownRemaining)}";
+                _queuedCountdownRemaining -= Time.deltaTime;
+                yield return null;
+            }
+            if (playerBThinkingLabel != null) playerBThinkingLabel.text = string.Empty;
 
             if (Machine != null && Machine.State == ConsentState.Requested)
             {
-                if (_queuedResponse == QueuedResponse.Accept) Machine.Accept(_idB);
-                else if (_queuedResponse == QueuedResponse.Reject) Machine.Cancel(_idB);
+                if (_queuedResponse == QueuedResponse.Accept)
+                {
+                    Machine.Accept(_idB);
+                    _lastDecision = "ACCEPTED";
+                }
+                else if (_queuedResponse == QueuedResponse.Reject)
+                {
+                    Machine.Cancel(_idB);
+                    _lastDecision = "REJECTED";
+                }
             }
 
             _queuedResponse = QueuedResponse.None;
             _queuedResponseRoutine = null;
+        }
+
+        /// <summary>Returns a live status string for the wall status board.</summary>
+        public string GetStatusReport()
+        {
+            float cooldownRemaining = Mathf.Max(0f, _cooldownEndTime - Time.time);
+            string queuedInfo = _queuedResponse != QueuedResponse.None
+                ? $"  (queued: {_queuedResponse})"
+                : string.Empty;
+            return
+                $"STATE: {Machine?.State}{queuedInfo}\n" +
+                $"LAST DECISION: {_lastDecision}\n" +
+                $"COOLDOWN: {cooldownRemaining:F0}s\n" +
+                $"DISTANCE: {CurrentDistance:F2} m";
         }
 
         /// <summary>
