@@ -1,0 +1,16 @@
+{
+  "name": "ConsentProximity.Tests.PlayMode",
+  "rootNamespace": "ConsentProximity.Tests.PlayMode",
+    "references": [
+        "ConsentProximity.Runtime",
+        "ConsentProximity.Tests.EditMode"
+    ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

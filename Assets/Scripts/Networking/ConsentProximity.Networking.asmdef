@@ -1,0 +1,19 @@
+{
+  "name": "ConsentProximity.Networking",
+  "rootNamespace": "",
+  "references": [
+    "ConsentProximity.Runtime",
+    "ConsentProximity.Framework"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "ENABLE_CONSENT_NGO"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

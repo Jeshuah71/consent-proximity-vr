@@ -4,5 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
-  m_configObjects: {}
+  m_Scenes:
+  - enabled: 1
+    path: Assets/ConsentProximityFramework/Samples/TestHarness/IntegrationTestHarness.unity
+    guid: acc4f9e0b554d4e42aad4ceac912fbb7
+  m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 96411dd6fa8ccf54299b95e62d541bbd, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: cbdf1e11c140fa549b814d638adb1e04, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 56dc3e763df08b046b129e8ffae78f7b, type: 2}
+  m_UseUCBPForAssetBundles: 0

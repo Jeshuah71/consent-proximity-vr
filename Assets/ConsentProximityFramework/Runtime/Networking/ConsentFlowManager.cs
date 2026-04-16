@@ -1,55 +1,210 @@
+using System;
+using ConsentProximity.Core;
+using ConsentProximity.StateMachine;
 using UnityEngine;
 
 namespace ConsentProximityFramework.Runtime.Networking
 {
-    ///<summary>
-    /// manages the consent flow state for an interaction
-    /// this class acts as the central authority for consent logic
+    /// <summary>
+    /// Thin Unity-facing wrapper around the core consent state machine.
+    /// This keeps networking and samples on the same logic path.
     /// </summary>
-    public class ConsentFlowManager : MonoBehaviour //Scrip attached to GameObject
+    public class ConsentFlowManager : MonoBehaviour
     {
-        //current consent state
-        [SerializeField]//show pv variable in inspector(only in unity - safe visibility)
-        private ConsentState currentState = ConsentState.Idle;
-         ///<summary>
-         /// Gets the current consent state
-         /// </summary>
-         public ConsentState CurrentState
+        [SerializeField] private float maxRangeMeters = 2f;
+        [SerializeField] private float requestTimeoutSeconds = 8f;
+
+        public event Action<ConsentState> OnStateChanged;
+
+        public ConsentState CurrentState => _machine.State;
+
+        private readonly ParticipantId _requester = new ParticipantId("Requester");
+        private readonly ParticipantId _responder = new ParticipantId("Responder");
+
+        private ConsentStateMachine _machine;
+        private ManualDistanceProvider _distanceProvider;
+        private readonly RuntimeClock _clock = new RuntimeClock();
+        private bool _isInRange;
+
+        private void Awake()
         {
-            get { return currentState; }
+            EnsureMachine();
         }
 
-        ///<summary>
-        /// Sets a new consent state
-        /// all state changes should go through this method
-        /// </summary
-        public void SetState(ConsentState newState)
+        public void EnterProximity()
         {
-            currentState = newState;
-            Debug.Log($"Consent state changed to: {currentState}");
+            EnsureMachine();
+            _isInRange = true;
+            _distanceProvider.DistanceMeters = 0f;
+            _machine.SetInRange(true);
         }
 
-        ///<summary>
-        /// called when another user leaves proximity range
-        /// </suumary>
-    public void EnterProximity()
-        {
-            if(currentState == ConsentState.Idle)
-            {
-                SetState(ConsentState.InRange);
-            }
-        }
-
-        ///<summary>
-        /// Called when another user leaves proximity range
-        /// </summary>
         public void ExitProximity()
         {
-            if(currentState == ConsentState.InRange)
+            EnsureMachine();
+            _isInRange = false;
+            _distanceProvider.DistanceMeters = maxRangeMeters + 1f;
+            _machine.SetInRange(false);
+
+            if (_machine.State == ConsentState.Terminated)
             {
-                SetState(ConsentState.Idle);
+                ResetMachine(false);
             }
         }
 
+        public void RequestConsent()
+        {
+            EnsureMachine();
+            _machine.RequestConsent(_requester);
+        }
+
+        public void OnConsentRequested()
+        {
+            RequestConsent();
+        }
+
+        public void AcceptConsent()
+        {
+            EnsureMachine();
+            _machine.Accept(_responder);
+        }
+
+        public void OnConsentAccepted()
+        {
+            AcceptConsent();
+        }
+
+        public void RejectConsent()
+        {
+            if (CurrentState != ConsentState.Requested)
+            {
+                Debug.Log("Reject blocked: no pending request.");
+                return;
+            }
+
+            ResetMachine(_isInRange);
+        }
+
+        public void OnConsentRejected()
+        {
+            RejectConsent();
+        }
+
+        public void WithdrawConsent()
+        {
+            EnsureMachine();
+            if (_machine.Withdraw(_responder))
+            {
+                ResetMachine(false);
+            }
+        }
+
+        public void OnConsentWithdrawn()
+        {
+            WithdrawConsent();
+        }
+
+        public void TerminateInteraction()
+        {
+            EnsureMachine();
+            if (_machine.Withdraw(_requester))
+            {
+                ResetMachine(false);
+            }
+        }
+
+        public void OnConsentTerminated(string reason = null)
+        {
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                Debug.Log($"Remote terminate reason: {reason}");
+            }
+
+            TerminateInteraction();
+        }
+
+        public void OnRemoteDisconnect()
+        {
+            EnsureMachine();
+
+            if (CurrentState == ConsentState.Requested || CurrentState == ConsentState.Active)
+            {
+                _machine.Withdraw(_requester);
+            }
+
+            ResetMachine(false);
+        }
+
+        public void OnRemoteDisconnect(ulong _)
+        {
+            OnRemoteDisconnect();
+        }
+
+        private void EnsureMachine()
+        {
+            if (_machine != null)
+            {
+                return;
+            }
+
+            _distanceProvider = new ManualDistanceProvider();
+            BuildMachine(_isInRange);
+        }
+
+        private void BuildMachine(bool inRange)
+        {
+            var config = new ConsentConfig
+            {
+                maxRangeMeters = maxRangeMeters,
+                requestTimeoutSeconds = requestTimeoutSeconds
+            };
+
+            _machine = new ConsentStateMachine(_requester, _responder, config, _clock, _distanceProvider);
+            _machine.OnStateChanged += HandleMachineStateChanged;
+            _distanceProvider.DistanceMeters = inRange ? 0f : maxRangeMeters + 1f;
+            _machine.SetInRange(inRange);
+        }
+
+        private void ResetMachine(bool inRange)
+        {
+            _isInRange = inRange;
+
+            if (_machine != null)
+            {
+                _machine.OnStateChanged -= HandleMachineStateChanged;
+            }
+
+            BuildMachine(inRange);
+            if (!inRange)
+            {
+                EmitStateChanged(CurrentState);
+            }
+        }
+
+        private void HandleMachineStateChanged(ConsentState _, ConsentState next)
+        {
+            EmitStateChanged(next);
+        }
+
+        private void EmitStateChanged(ConsentState state)
+        {
+            Debug.Log($"Consent state changed to: {state}");
+            OnStateChanged?.Invoke(state);
+        }
+
+        private sealed class ManualDistanceProvider : IDistanceProvider
+        {
+            public float DistanceMeters { get; set; } = float.MaxValue;
+
+            public float GetDistanceMeters(ParticipantId a, ParticipantId b)
+            {
+                return DistanceMeters;
+            }
+        }
+
+        private sealed class RuntimeClock : IClock
+        {
+            public float Now => Time.unscaledTime;
+        }
     }
 }
