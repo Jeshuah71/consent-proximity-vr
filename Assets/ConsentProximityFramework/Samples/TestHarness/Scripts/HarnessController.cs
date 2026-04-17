@@ -365,6 +365,19 @@ namespace ConsentProximity.TestHarness
             img.color = flashColor;
             yield return new WaitForSeconds(durationSeconds);
             img.color = original;
+
+            // After the flash, re-sync the UI to the current machine state.
+            // Without this, the panel stays visible after a timeout/reject flash
+            // because FlashPanelCoroutine re-activated it but nothing hides it afterward.
+            if (consentUI != null && Machine != null)
+            {
+                switch (Machine.State)
+                {
+                    case ConsentState.Requested: consentUI.Show(); break;
+                    case ConsentState.Active:    consentUI.ShowWithdrawOnly(); break;
+                    default:                     consentUI.Hide(); break;
+                }
+            }
         }
 
         private void WireConsentUI()
