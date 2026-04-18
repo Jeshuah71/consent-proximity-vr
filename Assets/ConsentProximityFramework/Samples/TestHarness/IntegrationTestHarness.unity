@@ -687,6 +687,7 @@ GameObject:
   - component: {fileID: 111688245}
   - component: {fileID: 111688244}
   - component: {fileID: 111688243}
+  - component: {fileID: 111688247}
   m_Layer: 0
   m_Name: PlayerB
   m_TagString: Untagged
@@ -787,10 +788,23 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 579102695}
   - {fileID: 1792373597}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &111688247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111688242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f43c20ccb732f54a865ede0989c6497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ConsentProximity.TestHarness.PlayerBobbing
+  amplitude: 0.05
+  frequency: 0.8
 --- !u!1 &118884459
 GameObject:
   m_ObjectHideFlags: 0
@@ -3156,9 +3170,9 @@ MonoBehaviour:
   playerA: {fileID: 1367027641}
   playerARigRoot: {fileID: 287319528}
   playerB: {fileID: 111688246}
-  maxRangeMeters: 4
+  maxRangeMeters: 5
   requestTimeoutSeconds: 60
-  minSafeDistanceMeters: 2
+  minSafeDistanceMeters: 2.5
   autoRequestOnInRange: 1
   rejectionCooldownSeconds: 60
   oneConsentPerSession: 1
@@ -3380,6 +3394,7 @@ GameObject:
   - component: {fileID: 579102695}
   - component: {fileID: 579102698}
   - component: {fileID: 579102697}
+  - component: {fileID: 579102699}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -3395,12 +3410,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 579102694}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.95, z: 0}
-  m_LocalScale: {x: 4, y: 0.01, z: 4}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.050000012, z: -5}
+  m_LocalScale: {x: 5, y: 0.01, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 111688246}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &579102697
 MeshRenderer:
@@ -3459,6 +3474,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 579102694}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &579102699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579102694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f5f0baa2ff1f6444a0f04773d98223a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ConsentProximity.TestHarness.ZoneRingPulse
+  harness: {fileID: 497886361}
+  baseScale: 5
+  pulseAmount: 0.2
+  pulseSpeed: 0.6
+  idleColor: {r: 0.55, g: 0.55, b: 0.55, a: 0.25}
+  inRangeColor: {r: 0.9, g: 0.8, b: 0.1, a: 0.45}
+  requestedColor: {r: 0.9, g: 0.6, b: 0, a: 0.7}
+  activeColor: {r: 0.2, g: 0.85, b: 0.3, a: 0.65}
+  terminatedColor: {r: 0.8, g: 0.2, b: 0.2, a: 0.3}
 --- !u!1 &582546331
 GameObject:
   m_ObjectHideFlags: 0
@@ -9155,14 +9191,14 @@ MonoBehaviour:
 '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4291476381
-  m_fontColor: {r: 0.6167675, g: 0.7350862, b: 0.7924528, a: 1}
+    rgba: 4285291839
+  m_fontColor: {r: 0.24630652, g: 0.3651211, b: 0.4245283, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -9252,7 +9288,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11557,8 +11593,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4289436278
-  m_fontColor: {r: 0.46444464, g: 0.60275286, b: 0.6698113, a: 1}
+    rgba: 4286081093
+  m_fontColor: {r: 0.26922393, g: 0.4067536, b: 0.4716981, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -12169,6 +12205,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ConsentUIPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 3469844239665558794, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3680446544277481914, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -12275,7 +12315,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5848426015901018351, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 5848426015901018351, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
       propertyPath: m_SizeDelta.y
@@ -12303,7 +12343,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5848426015901018351, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.5
+      value: -3.2
       objectReference: {fileID: 0}
     - target: {fileID: 5848426015901018351, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -12391,7 +12431,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8638811317637682710, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
       propertyPath: timeoutSeconds
-      value: 0
+      value: 999
       objectReference: {fileID: 0}
     - target: {fileID: 8638811317637682710, guid: 1a9879015e9dda647b7ccd22320dbbb9, type: 3}
       propertyPath: OnAccept.m_PersistentCalls.m_Calls.Array.size
@@ -13878,3 +13918,4 @@ SceneRoots:
   - {fileID: 1608227722}
   - {fileID: 1821032224}
   - {fileID: 1538782398}
+  - {fileID: 579102695}
