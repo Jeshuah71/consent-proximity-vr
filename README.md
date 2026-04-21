@@ -9,7 +9,11 @@ Built with **Unity 6** (6000.3.6f1) · **OpenXR** · **Meta XR SDK v85** · **Ne
 
 ## Demo
 
-> 📹 **Demo video coming soon**
+| Consent Request | Accept Flow |
+|---|---|
+| ![Popup appears when Player A enters range](docs/popup.gif) | ![Accept → green flash, free movement](docs/accept.gif) |
+| **Reject Flow** | **Player B Idle** |
+| ![Reject → red flash, cooldown](docs/reject.gif) | ![Player B bobbing in place](docs/ring.gif) |
 
 ---
 
